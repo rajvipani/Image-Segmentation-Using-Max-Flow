@@ -6,3 +6,5 @@ Project for class EC-504
 * Chathura Abeyrathne
 * Sofia Briquet
 * Raj Vipani
+
+## Project Description
