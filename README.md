@@ -8,3 +8,4 @@ Project for class EC-504
 * Raj Vipani
 
 ## Project Description
+This project will focus on implementing image segmentation using max-flow min-cut algorithm as the project requirement for EC504 Advanced Data Structures and Algorithms. 
