@@ -1,32 +1,40 @@
-#include <opencv2/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
-
-#include <iostream>
-
-using namespace cv;
+#include "ImageData.hpp"
+#include "EdmondKarp.hpp"
 
 int main(int argc, char *argv[])
 {
-    std::string image_path;
-    if (argc==2){
-        image_path = samples::findFile(argv[1]);
-    }
-    else{
-        image_path = samples::findFile("rabbit.jpg");       
-    }
+    // std::string image_path;
+    // if (argc==2){
+    //     image_path = samples::findFile(argv[1]);
+    // }
+    // else{
+    //     image_path = samples::findFile("rabbit.jpg");       
+    // }
 
-    Mat img = imread(image_path, IMREAD_GRAYSCALE);
-    if(img.empty())
-    {
-        std::cout << "Could not read the image: " << image_path << std::endl;
-        return 1;
+    // //Mat img = imread(image_path, IMREAD_GRAYSCALE);
+    // if(img.empty())
+    // {
+    //     std::cout << "Could not read the image: " << image_path << std::endl;
+    //     return 1;
+    // }
+    string imageName = argv[1];
+    string algorithmChoice = argv[2];
+    
+    ImageData img(imageName);
+    img.Image_To_Flow_Graph();
+
+    cv::namedWindow("Display window", 1);
+    cv::imshow("Display window", img.image);
+
+    if (algorithmChoice == "edmond-karp") {
+        std::cout<<"\nRunning Edmond - Karp's Algorithm\n";
+        EdmondKarp ek(img.flow_graph);
+        ek.initiate_algorithm();
     }
-    imshow("Display window", img);
-    int k = waitKey(0); // Wait for a keystroke in the window
-    if(k == 's')
-    {
-        imwrite("rabbit.png", img);
-    }
+    int k = cv::waitKey(0);
+    // if(k == 's')
+    // {
+    //     imwrite("rabbit.png", img);
+    // }
     return 0;
 }
