@@ -9,4 +9,7 @@ build:
 run: build
 	./main rabbit.jpg
 
+shared:
+	$(CXX) $(CXXFLAGS) -fPIC -shared main.cpp $(LDFLAGS) -o main.so 
+
 .PHONY: build run
