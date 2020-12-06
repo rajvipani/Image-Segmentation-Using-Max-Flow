@@ -3,6 +3,7 @@
 EdmondKarp::EdmondKarp(vector<map<int, array<int,2>>> flow_graph) {
     image_flow_graph = flow_graph;
     segmentedImage.resize(flow_graph.size());
+    std::fill(segmentedImage.begin(), segmentedImage.end(), false);
     graph_source = flow_graph.size() - 2;
     graph_sink = flow_graph.size() - 1;
 }
@@ -12,12 +13,11 @@ void EdmondKarp::initiate_algorithm() {
     int flow_p = 0;
     int iter = 0;
     while(true) {
-        
         vector<int> path;
         set<int> accessibleNodes;
         getAugmentingPaths(path, accessibleNodes);
         if( path.size() == 0) {
-            //std::cout<<"Find Mask";
+            makeSegmentation(accessibleNodes);
             break;
         } else {
             getFlowInAugmentingPath(path, flow_p);
@@ -25,22 +25,22 @@ void EdmondKarp::initiate_algorithm() {
             flow += flow_p;
         }
         iter ++;
+        std::cout<<iter<<"\n";
     }
-    //std::cout << "Number of iterations :" << iter << std::endl;
+    std::cout << "Number of iterations :" << iter << std::endl;
 }
 
 void EdmondKarp::getAugmentingPaths(vector<int>& path, set<int>& accessibleNodes) {
-    stack<int> q;
+    stack<int> s;
     map<int, int> visited;
 
-    q.push(graph_source);
+    s.push(graph_source);
     visited.insert({graph_source, graph_source});
 
-    while(!q.empty()) {
+    while(!s.empty()) {
         
-        int current = q.top();
-        //std::cout<<current<<" "<<graph_sink<<"\n";
-        q.pop();
+        int current = s.top();
+        s.pop();
         if (current == graph_sink) {
             path.reserve(visited.size());
             int next_node = graph_sink;
@@ -56,9 +56,8 @@ void EdmondKarp::getAugmentingPaths(vector<int>& path, set<int>& accessibleNodes
         for(auto& next_node_values : image_flow_graph[current]) {
             if(visited.find(next_node_values.first) == visited.end()) {
                 //cout<<next_node_values.second[capacity]<<" "<<next_node_values.second[flow]<<"\n";
-                if((next_node_values.second[0]-next_node_values.second[flow]) > 0) {
-                    //cout<<"Here\n";
-                    q.push(next_node_values.first);
+                if((next_node_values.second[0]-next_node_values.second[1]) > 0) {
+                    s.push(next_node_values.first);
                     visited.emplace(next_node_values.first, current);
                 }
             }
@@ -83,12 +82,17 @@ void EdmondKarp::getFlowInAugmentingPath(vector<int>& path, int& flow_p) {
 
 void EdmondKarp::augmentFlow(vector<int>& path, int& flow_p) {
     int i = path.size()-1;
-    while(path[i] != graph_sink)
-    {
+    while(path[i] != graph_sink) {
         int u = path[i];
         int v = path[i-1];
         image_flow_graph[u][v][1] += flow_p;
         image_flow_graph[v][u][1] -= flow_p;
         i -=1;
+    }
+}
+
+void EdmondKarp::makeSegmentation(set<int> accessibleNodes) {
+    for(auto node:accessibleNodes) {
+        segmentedImage[node] = true;
     }
 }

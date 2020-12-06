@@ -2,13 +2,12 @@
 #define EDMONDKARP_HPP
 
 #include <iostream>
-#include <string>
 #include <vector>
 #include <map>
 #include <array>
 #include <set>
 #include <stack>
-enum edge_variables_for_original_graph{capacity,flow};
+
 using namespace std;
 
 class EdmondKarp {
@@ -22,6 +21,7 @@ class EdmondKarp {
         void getAugmentingPaths(vector<int>& path, set<int>& accessibleNodes);
         void getFlowInAugmentingPath(vector<int>& path, int& flow_p);
         void augmentFlow(vector<int>& path, int& flow_p);
+        void makeSegmentation(set<int> accessibleNodes);
 };
 
 #endif
