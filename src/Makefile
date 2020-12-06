@@ -1,15 +1,15 @@
-CXX      := g++
-CXXFLAGS := -g `pkg-config --cflags opencv4` #-fsanitize=address 
-LDFLAGS  := `pkg-config --libs opencv4` #-fsanitize=address 
+CXX      := g++ -std=c++11
+CXXFLAGS := `pkg-config --cflags opencv4`
+LDFLAGS  := `pkg-config --libs opencv4`
 
 build:
-	$(CXX) $(CXXFLAGS) main.cpp $(LDFLAGS) -o main 
+	$(CXX) $(CXXFLAGS) main.cpp ImageData.cpp EdmondKarp.cpp $(LDFLAGS) -o main 
 
 
 run: build
-	./main rabbit.jpg
+	./main apple.png
 
 shared:
-	$(CXX) $(CXXFLAGS) -fPIC -shared main.cpp $(LDFLAGS) -o main.so 
+	$(CXX) $(CXXFLAGS) -fPIC -shared EdmondK.cpp ImageData.cpp EdmondKarp.cpp $(LDFLAGS) -o main.so
 
 .PHONY: build run

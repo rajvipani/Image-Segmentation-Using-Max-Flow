@@ -1,0 +1,4 @@
+/home/dean/boston/Image-Segmentation-Using-Max-Flow/gui/rabbit.png
+1
+78, 211
+239, 232

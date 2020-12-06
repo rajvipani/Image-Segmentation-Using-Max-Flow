@@ -10,12 +10,17 @@ from ctypes import *
 
 if __name__ == "__main__":
     lib = cdll.LoadLibrary('./main.so')
-    lib.file_read_c.argtypes = c_char_p,
+    libedk = cdll.LoadLibrary('./../src/main.so')
+    #lib.file_read_c.restype = POINTER(c_char_p * 256)
+    lib.file_read_c.argtypes = (c_char_p,c_char_p)
+    lib.kmeans_clustering_c.argtypes = (c_char_p,c_char_p)
+    libedk.edmondk_c.argtypes = (c_char_p,c_char_p)
 
     out = lib.test_funcc()
 
 
     root = Tk()
+    root.title("EC504 - Project Demostration")
 
     #setting up a tkinter canvas with scrollbars
     frame = Frame(root, bd=2, relief=SUNKEN)
@@ -40,7 +45,7 @@ if __name__ == "__main__":
 
     backg = []
     foreg = []
-    num_of_pixels_from_each = 2
+    num_of_pixels_from_each = 1
     ovals = []
     n = 0
     #function to be called when mouse is clicked
@@ -87,9 +92,23 @@ if __name__ == "__main__":
     def cpp():
         global info_file
         p = create_string_buffer(20) # create 128 byte buffer
+        outfile = create_string_buffer(256)
+        outfile.value = b'dummy_word'
+
+        #print(repr(outfile.value()))
         p.value = b'image_data.txt'
-        out = lib.file_read_c(p)
+        out = lib.file_read_c(p,outfile)
         print(out)
+        #print(repr(outfile.value()))
+        #print(sizeof(outfile), repr(outfile.raw))
+        print(outfile.value.decode("utf-8"))
+        new_image_name = outfile.value.decode("utf-8")
+        nwin = Toplevel()
+        nwin.title("New Window")
+        photo2 = PhotoImage(file = new_image_name)
+        lbl2 = Label(nwin, image = photo2)
+        lbl2.pack()
+        nwin.mainloop()
 
 
     def errorCallBack():
@@ -115,29 +134,65 @@ if __name__ == "__main__":
                 f.write('\n')
             f.close()
 
+    def points_check():
+        global backg, foreg, num_of_pixels_from_each
+        if (len(backg)!=num_of_pixels_from_each or len(foreg)!=num_of_pixels_from_each):
+            messagebox.showerror( "ERROR", "ERROR: Required number of points are not selected, please reset and select again")
+
+    def kmeans():
+        points_check()
+        global info_file
+        p = create_string_buffer(20) # create 128 byte buffer
+        outfile = create_string_buffer(256)
+        outfile.value = b'dummy_word'
+        p.value = b'image_data.txt'
+        out = lib.kmeans_clustering_c(p,outfile)
+        new_image_name = outfile.value.decode("utf-8")
+        nwin = Toplevel()
+        nwin.title("K-Means image segmentation")
+        photo2 = PhotoImage(file = new_image_name)
+        lbl2 = Label(nwin, image = photo2)
+        lbl2.pack()
+        nwin.mainloop()
+
+    def edk():
+        points_check()
+        global info_file
+        p = create_string_buffer(20) # create 128 byte buffer
+        outfile = create_string_buffer(256)
+        outfile.value = b'dummy_word'
+        p.value = b'image_data.txt'
+        out = libedk.edmondk_c(p,outfile)
+        new_image_name = outfile.value.decode("utf-8")
+        nwin = Toplevel()
+        nwin.title("Edmond - Karp's Max-Flow Image Segmentation")
+        photo2 = PhotoImage(file = new_image_name)
+        lbl2 = Label(nwin, image = photo2)
+        lbl2.pack()
+        nwin.mainloop()
 
     OPTIONS = [1,2,3,4,5]
     variable = StringVar(root)
     #variable.set(OPTIONS[0]) # default value
     
-    def display_selected_item_index(event): 
-       global so, num_of_pixels_from_each
-       #print ('index of this item is: {}\n'.format(so.current()))
-       num_of_pixels_from_each =  OPTIONS[so.current()]
-       print(num_of_pixels_from_each)
+    # def display_selected_item_index(event): 
+    #    global so, num_of_pixels_from_each
+    #    #print ('index of this item is: {}\n'.format(so.current()))
+    #    num_of_pixels_from_each =  OPTIONS[so.current()]
+    #    print(num_of_pixels_from_each)
     
-    def OptionCallBack(*args):
-        print (variable.get())
+    # def OptionCallBack(*args):
+    #     print (variable.get())
     
-    #variable = StringVar(app)
-    variable.set("Select number of points")
-    variable.trace('w', OptionCallBack)
+    # #variable = StringVar(app)
+    # variable.set("Select number of points")
+    # variable.trace('w', OptionCallBack)
     
-    so = ttk.Combobox(root, textvariable=variable)
-    so.config(values =(1,2,3,4,5))
-    #so.grid(row=1, column=4, sticky='E', padx=10)    
-    so.bind("<<ComboboxSelected>>", display_selected_item_index) 
-    so.pack()
+    # so = ttk.Combobox(root, textvariable=variable)
+    # so.config(values =(1,2,3,4,5))
+    # #so.grid(row=1, column=4, sticky='E', padx=10)    
+    # so.bind("<<ComboboxSelected>>", display_selected_item_index) 
+    # so.pack()
 
 
     B = Button(root, text ="Reset Selection", command = reset_sel)
@@ -146,11 +201,18 @@ if __name__ == "__main__":
     B2 = Button(root, text ="Store Coordinates", command = store_coords)
     B2.pack()
 
-    B3 = Button(root, text ="Exit", command = exit)
-    B3.pack()
-
     B4 = Button(root, text ="Call CPP", command = cpp)
     B4.pack()
+
+    B5 = Button(root, text ="K-Means", command = kmeans)
+    B5.pack()
+
+    B5 = Button(root, text ="EdmondKarp", command = edk)
+    B5.pack()
+
+
+    B3 = Button(root, text ="Exit", command = exit)
+    B3.pack()
     # var = StringVar()
     # label = Message( root, textvariable=var, relief=RAISED )
 

@@ -1,6 +1,0 @@
-/home/dean/boston/Image-Segmentation-Using-Max-Flow/src/rabbit.jpg
-2
-93, 235
-100, 94
-229, 220
-176, 165
