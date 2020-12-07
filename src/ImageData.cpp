@@ -94,5 +94,6 @@ void ImageData::saveImage(vector<int> segmentedImage) {
         }
         
     }
+    std::cout<<"Saving Image..\n";
     cv::imwrite("output.png",mask);   
 }
