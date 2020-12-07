@@ -32,15 +32,22 @@ int edmondk(char *file, char out_file[256])
     ImageData img(imageName);
     img.Image_To_Flow_Graph(src_x, src_y, sink_x, sink_y);
 
-    cv::namedWindow("Display window", 1);
-    cv::imshow("Display window", img.image);
+    //cv::namedWindow("Display window", 1);
+    //cv::imshow("Display window", img.image);
 
     if (algorithmChoice == "edmond-karp") {
         std::cout<<"\nRunning Edmond - Karp's Algorithm\n";
         EdmondKarp ek(img.flow_graph);
         ek.initiate_algorithm();
+        img.saveImage(ek.segmentedImage);
     }
-    int k = cv::waitKey(0);
+
+    char* path = realpath(".", NULL);
+    string abspath(path);
+    string dstname("output_ek.png");
+    string out_file_str = abspath+"/"+dstname;
+    strncpy(out_file, out_file_str.c_str(),256);
+    //int k = cv::waitKey(0);
     // if(k == 's')
     // {
     //     imwrite("rabbit.png", img);

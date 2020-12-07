@@ -25,8 +25,9 @@ void EdmondKarp::initiate_algorithm() {
             flow += flow_p;
         }
         iter ++;
-        std::cout<<iter<<"\n";
+        //std::cout<<iter<<"\n";
     }
+    std::cout<<flow<<"\n";
     std::cout << "Number of iterations :" << iter << std::endl;
 }
 
@@ -43,13 +44,7 @@ void EdmondKarp::getAugmentingPaths(vector<int>& path, set<int>& accessibleNodes
         s.pop();
         if (current == graph_sink) {
             path.reserve(visited.size());
-            int next_node = graph_sink;
-            path.emplace_back(next_node);
-            while(next_node != graph_source) {
-                auto temp = visited.find(next_node);
-                next_node = temp->second;
-                path.emplace_back(next_node);
-            }
+            getPath(path, visited);
             break;
         }
 
@@ -68,10 +63,18 @@ void EdmondKarp::getAugmentingPaths(vector<int>& path, set<int>& accessibleNodes
     }
 }
 
-void EdmondKarp::getFlowInAugmentingPath(vector<int>& path, int& flow_p) {
-    if (path.front() == graph_sink && path.back() == graph_source) {
-        return;
+void EdmondKarp::getPath(vector<int>& path,const std::map<int,int>& visited) {
+    int next_node = graph_sink;
+    path.emplace_back(next_node);
+    while(next_node != graph_source) {
+        auto temp = visited.find(next_node);
+        next_node = temp->second;
+        path.emplace_back(next_node);
     }
+}
+
+void EdmondKarp::getFlowInAugmentingPath(vector<int>& path, int& flow_p) {
+    assert(path.front() == graph_sink && path.back() == graph_source);
     flow_p = image_flow_graph[path[path.size()-1]][path[path.size()-2]][0];
     for(int i= path.size()-1 ; i > 0; --i) { 
         int u = path[i];
@@ -95,4 +98,5 @@ void EdmondKarp::makeSegmentation(set<int> accessibleNodes) {
     for(auto node:accessibleNodes) {
         segmentedImage[node] = true;
     }
+
 }

@@ -7,6 +7,7 @@
 #include <array>
 #include <set>
 #include <stack>
+#include <assert.h>
 
 using namespace std;
 
@@ -21,6 +22,7 @@ class EdmondKarp {
         void getAugmentingPaths(vector<int>& path, set<int>& accessibleNodes);
         void getFlowInAugmentingPath(vector<int>& path, int& flow_p);
         void augmentFlow(vector<int>& path, int& flow_p);
+        void getPath(vector<int>& path,const std::map<int,int>& visited);
         void makeSegmentation(set<int> accessibleNodes);
 };
 

@@ -1,4 +1,4 @@
-/home/dean/boston/Image-Segmentation-Using-Max-Flow/gui/rabbit.png
+/home/dean/boston/Image-Segmentation-Using-Max-Flow/gui/apple.png
 1
-78, 211
-239, 232
+30, 33
+74, 125

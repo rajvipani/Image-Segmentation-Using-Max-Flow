@@ -260,7 +260,7 @@ int file_read(char *file, char out_file[256]){
     string out_file_str = directory+"/"+dstname;
     imwrite(out_file_str, img);
     strncpy(out_file, out_file_str.c_str(),256);
-    //Mat ocv = img;
+
     printf("OUTPUT FILE: %s\n",out_file);
     return 0;
 }
