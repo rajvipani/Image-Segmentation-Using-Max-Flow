@@ -21,6 +21,9 @@ int main(int argc, char *argv[])
     string algorithmChoice = argv[2];
     
     ImageData img(imageName);
+    cv::Mat dest;
+    cv::resize(img.image,dest,cv::Size(50,50),0,0,cv::INTER_CUBIC);
+    img.image = dest;
     img.Image_To_Flow_Graph();
 
     cv::namedWindow("Display window", 1);
@@ -30,6 +33,8 @@ int main(int argc, char *argv[])
         std::cout<<"\nRunning Edmond - Karp's Algorithm\n";
         EdmondKarp ek(img.flow_graph);
         ek.initiate_algorithm();
+        img.saveImage(ek.segmentedImage);
+        std::cout<<ek.segmentedImage.size()<<"\n";
     }
     int k = cv::waitKey(0);
     // if(k == 's')

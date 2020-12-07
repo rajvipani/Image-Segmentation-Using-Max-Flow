@@ -25,7 +25,9 @@ class ImageData {
         void Image_To_Flow_Graph();
         float CalculateWeight(int i, int j, int u, int v);
         void addEdge(int node1, int node2, int edge_weight);
-        void addInterPixelEdge(int i, int j, int u, int v);
+        void addInterPixelEdges(int i, int j);
+        void makeEdge(int i, int j, int u, int v);
         bool imageBoundryCheck(int i, int j);
+        void saveImage(vector<int> segmentedImage);
 };
 #endif
