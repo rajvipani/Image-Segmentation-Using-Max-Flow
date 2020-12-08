@@ -1,28 +1,15 @@
 #include "ImageData.hpp"
 #include "EdmondKarp.hpp"
+#include "PushRelabel.hpp"
 
 int main(int argc, char *argv[])
 {
-    // std::string image_path;
-    // if (argc==2){
-    //     image_path = samples::findFile(argv[1]);
-    // }
-    // else{
-    //     image_path = samples::findFile("rabbit.jpg");       
-    // }
-
-    // //Mat img = imread(image_path, IMREAD_GRAYSCALE);
-    // if(img.empty())
-    // {
-    //     std::cout << "Could not read the image: " << image_path << std::endl;
-    //     return 1;
-    // }
     int src_x, src_y, sink_x, sink_y;
 
-    src_x = 15;
-    src_y = 15;
-    sink_x = 100;
-    sink_y = 100;
+    src_x = 33;
+    src_y = 33;
+    sink_x = 15;
+    sink_y = 15;
 
     string imageName = argv[1];
     string algorithmChoice = argv[2];
@@ -60,12 +47,12 @@ int main(int argc, char *argv[])
         EdmondKarp ek(img.flow_graph);
         ek.initiate_algorithm();
         img.saveImage(ek.segmentedImage);
-        std::cout<<ek.segmentedImage.size()<<"\n";
+
+    } else if (algorithmChoice == "push-relabel") {
+        std::cout<<"\nRunning Push - Relabel Algorithm\n";
+        PushRelabel pr(img.flow_graph);
+        pr.initiate_algorithm();
+        img.saveImage(pr.segmentedImage);
     }
-    //int k = cv::waitKey(0);
-    // if(k == 's')
-    // {
-    //     imwrite("rabbit.png", img);
-    // }
     return 0;
 }

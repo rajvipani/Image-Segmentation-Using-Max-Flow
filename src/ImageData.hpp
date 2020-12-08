@@ -9,6 +9,7 @@
 #include <vector>
 #include <map>
 #include <array>
+#include <time.h>
 
 using namespace std;
 
@@ -28,6 +29,6 @@ class ImageData {
         void addInterPixelEdges(int i, int j);
         void makeEdge(int i, int j, int u, int v);
         bool imageBoundryCheck(int i, int j);
-        void saveImage(vector<int> segmentedImage);
+        void saveImage(vector<int> segmentedImage, string img_output);
 };
 #endif

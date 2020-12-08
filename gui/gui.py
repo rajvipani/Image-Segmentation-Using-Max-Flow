@@ -7,20 +7,25 @@ from tkinter import messagebox
 from ctypes import cdll
 from tkinter import ttk 
 from ctypes import *
+import cv2
 
 if __name__ == "__main__":
     lib = cdll.LoadLibrary('./main.so')
-    libedk = cdll.LoadLibrary('./../src/main.so')
+    libedk = cdll.LoadLibrary('./../src/edk.so')
+    libpushr = cdll.LoadLibrary('./../src/pushr.so')
     #lib.file_read_c.restype = POINTER(c_char_p * 256)
-    lib.file_read_c.argtypes = (c_char_p,c_char_p)
-    lib.kmeans_clustering_c.argtypes = (c_char_p,c_char_p)
-    libedk.edmondk_c.argtypes = (c_char_p,c_char_p)
-
-    out = lib.test_funcc()
+    #lib.file_read_c.argtypes = (c_char_p,c_char_p)
+    lib.kmeans_clustering_c.argtypes = (c_char_p,c_char_p,c_char_p,c_char_p)
+    libedk.edmondk_c.argtypes = (c_char_p,c_char_p,c_char_p,c_char_p)
+    libpushr.pushr_c.argtypes = (c_char_p,c_char_p,c_char_p,c_char_p)
+    #out = lib.test_funcc()
 
 
     root = Tk()
     root.title("EC504 - Project Demostration")
+
+    image_scale = 250
+    image_size = 50
 
     #setting up a tkinter canvas with scrollbars
     frame = Frame(root, bd=2, relief=SUNKEN)
@@ -37,8 +42,18 @@ if __name__ == "__main__":
     frame.pack(fill=BOTH,expand=1)
 
     #adding the image
-    File = askopenfilename(parent=root, initialdir="./",title='Choose an image.',filetypes = (("image files","*.jpg"), ("all files", "*.*") ,("image files","*.png")) ) 
+    File = askopenfilename(parent=root, initialdir="../images/",title='Choose an image.',filetypes = (("image files","*.jpg"), ("all files", "*.*") ,("image files","*.png")) ) 
     img = ImageTk.PhotoImage(Image.open(File))
+    if (img.width()>=50 and img.height()>=50):
+        print("INFO: Rescaling image to 50x50")
+        img = cv2.imread(File, cv2.IMREAD_GRAYSCALE)
+        img = cv2.resize(img, (50,50), interpolation = cv2.INTER_AREA) 
+        new_file = "resized.jpg"
+        cv2.imwrite(new_file, img)  
+        img = ImageTk.PhotoImage(Image.open(new_file).resize((image_scale,image_scale)))
+        File = new_file
+    else:
+        img = ImageTk.PhotoImage(Image.open(File).resize((image_scale,image_scale)))
     print(File)
     canvas.create_image(0,0,image=img,anchor="nw")
     canvas.config(scrollregion=canvas.bbox(ALL))
@@ -51,7 +66,7 @@ if __name__ == "__main__":
     #function to be called when mouse is clicked
     def printcoords(event):
         #outputting x and y coords to console
-        python_green = "#476042"
+        python_green = "#00FF00"
         python_red = "#FF0000"
         pixel_size = 4
         if (event.x>img.width() or event.y>img.height()):
@@ -61,7 +76,7 @@ if __name__ == "__main__":
             x2, y2 = (event.x + pixel_size), (event.y + pixel_size)
             global n, backg, foreg, ovals
             n = n + 1
-            print (event.x,event.y)
+            print (event.x*image_size/image_scale,event.y*image_size/image_scale)
             if (n <= num_of_pixels_from_each):
                 backg.append((event.x,event.y))
                 ovals.append( canvas.create_oval(x1, y1, x2, y2, fill=python_green) )
@@ -74,7 +89,7 @@ if __name__ == "__main__":
     #mouseclick event
     canvas.bind("<Button 1>",printcoords)
 
-    messagebox.showinfo( "Instructions", "Please select two background points and two foreground points on the image respectively.\nThese points will be used as seeds for max flow algorithms\nUse RESET button to reset the selection")
+    messagebox.showinfo( "Instructions", "Please select one background point and one foreground point on the image respectively.\nThese points will be used as seeds for max flow algorithms\nUse RESET button to reset the selection")
 
     info_file = "image_data.txt"
 
@@ -125,11 +140,11 @@ if __name__ == "__main__":
             f.write(str(num_of_pixels_from_each))
             f.write('\n')
             for i in range(0,len(backg)):
-                str1 = str(backg[i][0])+", "+str(backg[i][1])
+                str1 = str(int(backg[i][0]*image_size/image_scale))+", "+str(int(backg[i][1]*image_size/image_scale))
                 f.write(str1)
                 f.write('\n')
             for i in range(0,len(foreg)):
-                str2 = str(foreg[i][0])+", "+str(foreg[i][1])
+                str2 = str(int(foreg[i][0]*image_size/image_scale))+", "+str(int(foreg[i][1]*image_size/image_scale))
                 f.write(str2)
                 f.write('\n')
             f.close()
@@ -144,15 +159,27 @@ if __name__ == "__main__":
         global info_file
         p = create_string_buffer(20) # create 128 byte buffer
         outfile = create_string_buffer(256)
+        time_o = create_string_buffer(128)
+        iterl = create_string_buffer(128)
         outfile.value = b'dummy_word'
         p.value = b'image_data.txt'
-        out = lib.kmeans_clustering_c(p,outfile)
+        out = lib.kmeans_clustering_c(p,outfile,time_o,iterl)
         new_image_name = outfile.value.decode("utf-8")
+        time_1 = time_o.value.decode("utf-8")
+        iterl = iterl.value.decode("utf-8")
         nwin = Toplevel()
         nwin.title("K-Means image segmentation")
-        photo2 = PhotoImage(file = new_image_name)
+        photo2 = ImageTk.PhotoImage(Image.open(new_image_name).resize((image_scale,image_scale))) #file = new_image_name)
         lbl2 = Label(nwin, image = photo2)
         lbl2.pack()
+        time_display = StringVar()
+        time_display.set("Elapsed Time    : "+str(time_1)+" Seconds")
+        iter_d = StringVar()
+        iter_d.set("Iteration Count : "+str(iterl)) 
+        lbl1 = Label(nwin, textvariable=time_display)
+        lbl1.pack()
+        lbl3 = Label(nwin, textvariable=iter_d)
+        lbl3.pack()
         nwin.mainloop()
 
     def edk():
@@ -160,63 +187,83 @@ if __name__ == "__main__":
         global info_file
         p = create_string_buffer(20) # create 128 byte buffer
         outfile = create_string_buffer(256)
+        time_o = create_string_buffer(128)
+        iterl = create_string_buffer(128)
         outfile.value = b'dummy_word'
         p.value = b'image_data.txt'
-        out = libedk.edmondk_c(p,outfile)
+        out = libedk.edmondk_c(p,outfile,time_o,iterl)
         new_image_name = outfile.value.decode("utf-8")
+        time_1 = time_o.value.decode("utf-8")
+        iterl = iterl.value.decode("utf-8")
+        print(new_image_name)
         nwin = Toplevel()
         nwin.title("Edmond - Karp's Max-Flow Image Segmentation")
-        photo2 = PhotoImage(file = new_image_name)
+        photo2 = ImageTk.PhotoImage(Image.open(new_image_name).resize((image_scale,image_scale))) #file = new_image_name)
         lbl2 = Label(nwin, image = photo2)
         lbl2.pack()
+        time_display = StringVar()
+        time_display.set("Elapsed Time    : "+str(time_1)+" Seconds")
+        iter_d = StringVar()
+        iter_d.set("Iteration Count : "+str(iterl)) 
+        lbl1 = Label(nwin, textvariable=time_display)
+        lbl1.pack()
+        lbl3 = Label(nwin, textvariable=iter_d)
+        lbl3.pack()
         nwin.mainloop()
+
+
+    def pushr():
+        points_check()
+        global info_file
+        p = create_string_buffer(20) # create 128 byte buffer
+        outfile = create_string_buffer(256)
+        time_o = create_string_buffer(128)
+        iterl = create_string_buffer(128)
+        outfile.value = b'dummy_word'
+        p.value = b'image_data.txt'
+        out = libpushr.pushr_c(p,outfile,time_o,iterl)
+        new_image_name = outfile.value.decode("utf-8")
+        time_1 = time_o.value.decode("utf-8")
+        iterl = iterl.value.decode("utf-8")
+        nwin = Toplevel()
+        nwin.title("Push - Relabel Max-Flow Image Segmentation")
+        photo2 = ImageTk.PhotoImage(Image.open(new_image_name).resize((image_scale,image_scale))) #file = new_image_name)
+        lbl2 = Label(nwin, image = photo2)
+        lbl2.pack()
+        time_display = StringVar()
+        time_display.set("Elapsed Time    : "+str(time_1)+" Seconds")
+        iter_d = StringVar()
+        iter_d.set("Iteration Count : "+str(iterl)) 
+        lbl1 = Label(nwin, textvariable=time_display)
+        lbl1.pack()
+        lbl3 = Label(nwin, textvariable=iter_d)
+        lbl3.pack()
+        nwin.mainloop()
+
 
     OPTIONS = [1,2,3,4,5]
     variable = StringVar(root)
-    #variable.set(OPTIONS[0]) # default value
-    
-    # def display_selected_item_index(event): 
-    #    global so, num_of_pixels_from_each
-    #    #print ('index of this item is: {}\n'.format(so.current()))
-    #    num_of_pixels_from_each =  OPTIONS[so.current()]
-    #    print(num_of_pixels_from_each)
-    
-    # def OptionCallBack(*args):
-    #     print (variable.get())
-    
-    # #variable = StringVar(app)
-    # variable.set("Select number of points")
-    # variable.trace('w', OptionCallBack)
-    
-    # so = ttk.Combobox(root, textvariable=variable)
-    # so.config(values =(1,2,3,4,5))
-    # #so.grid(row=1, column=4, sticky='E', padx=10)    
-    # so.bind("<<ComboboxSelected>>", display_selected_item_index) 
-    # so.pack()
 
 
     B = Button(root, text ="Reset Selection", command = reset_sel)
-    B.pack()
+    B.pack(side=LEFT)
 
     B2 = Button(root, text ="Store Coordinates", command = store_coords)
-    B2.pack()
+    B2.pack(side=LEFT)
 
-    B4 = Button(root, text ="Call CPP", command = cpp)
-    B4.pack()
+    # B4 = Button(root, text ="Call CPP", command = cpp)
+    # B4.pack()
 
-    B5 = Button(root, text ="K-Means", command = kmeans)
-    B5.pack()
+    B4 = Button(root, text ="K-Means", command = kmeans)
+    B4.pack(side=LEFT)
 
     B5 = Button(root, text ="EdmondKarp", command = edk)
-    B5.pack()
+    B5.pack(side=LEFT)
 
+    B6 = Button(root, text ="Push-Relabel", command = pushr)
+    B6.pack(side=LEFT)
 
     B3 = Button(root, text ="Exit", command = exit)
-    B3.pack()
-    # var = StringVar()
-    # label = Message( root, textvariable=var, relief=RAISED )
-
-    # var.set("Select two background points")
-    # label.pack()
+    B3.pack(side=RIGHT)
 
     root.mainloop()

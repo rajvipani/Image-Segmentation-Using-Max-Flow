@@ -1,8 +1,8 @@
 #include "ImageData.hpp"
 #include "EdmondKarp.hpp"
+#include "PushRelabel.hpp"
 
-
-int edmondk(char *file, char out_file[256], char time[128], char iter[128])
+int pushr(char *file, char out_file[256], char time[128], char iter[128])
 {
 
     FILE *fp1;
@@ -13,6 +13,7 @@ int edmondk(char *file, char out_file[256], char time[128], char iter[128])
     double TT2;
     clock_t startt, endt; 
     fp1 = fopen(file,"r");
+    
     if (fp1 == NULL) {
         printf("Did not find input file \n");
         exit(1);
@@ -29,19 +30,21 @@ int edmondk(char *file, char out_file[256], char time[128], char iter[128])
         std::cout << "Could not read the image: " << image_name << std::endl;
         return 1;
     }
+
+    string imageName(image_name);
+    string algorithmChoice = "push-relabel";
+    
+    ImageData img(imageName);
+    cv::Mat dest;
+    // if (img.image.rows > 50 || img.image.cols > 50){
+    // cv::resize(img.image,dest,cv::Size(50,50),0,0,cv::INTER_CUBIC);
+    // img.image = dest;      
+    // }
     cout << "CORDINATES"<<endl;
     cout << file << endl;
     cout << src_x << " "<< src_y <<endl;
     cout << sink_x << " "<< sink_y <<endl;
 
-    string imageName(image_name);
-    string algorithmChoice = "edmond-karp";
-    
-    ImageData img(imageName);
-    // src_x = 33;
-    // src_y = 33;
-    // sink_x = 2;
-    // sink_y = 2;
     if (img.image.rows<src_x || img.image.rows<sink_x){
         cout << "ERROR: Coordinates exceed image dimentions"<<endl;
         return 1;
@@ -51,14 +54,11 @@ int edmondk(char *file, char out_file[256], char time[128], char iter[128])
         return 1;
     }
 
-
-    cout << "CORDINATES"<<endl;
-    cout << src_x << " "<< src_x <<endl;
-    cout << sink_x << " "<< sink_x <<endl;
     img.Image_To_Flow_Graph(src_x, src_y, sink_x, sink_y);
 
     //cv::namedWindow("Display window", 1);
     //cv::imshow("Display window", img.image);
+
     char* path = realpath(image_name, NULL);
     string abspath(path);
 
@@ -69,25 +69,28 @@ int edmondk(char *file, char out_file[256], char time[128], char iter[128])
         directory = abspath.substr(0, last_slash_idx);
     }
 
-    string dstname("output_ek.png");
+    string dstname("output_pr.png");
     string out_file_str = directory+"/"+dstname;
     strncpy(out_file, out_file_str.c_str(),256);
-
 
     if (algorithmChoice == "edmond-karp") {
         std::cout<<"\nRunning Edmond - Karp's Algorithm\n";
         EdmondKarp ek(img.flow_graph);
+        ek.initiate_algorithm();
+        img.saveImage(ek.segmentedImage, out_file_str);
+    }    
+    else if (algorithmChoice == "push-relabel") {
+        std::cout<<"\nRunning Push - Relabel Algorithm\n";
+        PushRelabel pr(img.flow_graph);
         startt = clock(); 
-        iterl = ek.initiate_algorithm();
+        iterl = pr.initiate_algorithm();
         endt = clock();
         TT2 = (double)(endt-startt)/CLOCKS_PER_SEC;
         printf("FINISHED --- TOTAL CPU TIME %f SECS \n",(float)TT2);
-        img.saveImage(ek.segmentedImage, out_file_str);
+        img.saveImage(pr.segmentedImage, out_file_str);
     }
-    //char buffer[128];
     snprintf(time, 128, "%f", (float)TT2);
     snprintf(iter, 128, "%d", iterl);
-
 
     return 0;
 }
@@ -95,7 +98,7 @@ int edmondk(char *file, char out_file[256], char time[128], char iter[128])
 
 
 extern "C" {
-    int edmondk_c(char *file, char outfile[256], char time[128], char iter[128]){
-         return edmondk(file,outfile,time,iter); 
+    int pushr_c(char *file, char outfile[256], char time[128], char iter[128]){
+         return pushr(file,outfile,time,iter); 
      };
 }
