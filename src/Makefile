@@ -3,7 +3,7 @@ CXXFLAGS := `pkg-config --cflags opencv4`
 LDFLAGS  := `pkg-config --libs opencv4`
 
 build:
-	$(CXX) $(CXXFLAGS) main.cpp ImageData.cpp EdmondKarp.cpp $(LDFLAGS) -o main 
+	$(CXX) $(CXXFLAGS) main.cpp ImageData.cpp EdmondKarp.cpp PushRelabel.cpp $(LDFLAGS) -o main 
 
 shared:
 	$(CXX) $(CXXFLAGS) -fPIC -shared EdmondK.cpp ImageData.cpp EdmondKarp.cpp $(LDFLAGS) -o main.so 

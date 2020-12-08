@@ -24,21 +24,10 @@ void ImageData::Image_To_Flow_Graph(int src_x, int src_y, int sink_x, int sink_y
             int pixelLinearValue = i * img_cols + j;
             addEdge(graph_source, pixelLinearValue, source_to_pixel_weight);
             float sink_to_pixel_weight = CalculateWeight(i, j, sinkNode[0], sinkNode[1]);
-            //std::cout<<source_to_pixel_weight<<" "<<sink_to_pixel_weight<<"\n";
             addEdge(pixelLinearValue, graph_sink, sink_to_pixel_weight);
             addInterPixelEdges(i,j);
         }
     }
-    // int j = 0;
-    // for(int i = 0; i < flow_graph.size(); i++) {
-    //     map<int, array<int,2>> myMap = flow_graph.at(i);
-    //     for(auto it = myMap.cbegin(); it != myMap.cend(); ++it) {
-    //         std::cout << it->first<<" "<<it->second[0]<<" "<<it->second[1] << "\n";
-    //         j += 1;
-    //     }
-        
-    // }
-    // std::cout << j<< "\n";
 }
 
 float ImageData::CalculateWeight(int i, int j, int u, int v) {
@@ -79,21 +68,21 @@ bool ImageData::imageBoundryCheck(int i, int j) {
 }
 
 void ImageData::saveImage(vector<int> segmentedImage) {
-    cv::Mat mask(image.rows, image.cols, CV_8UC1);
+    cv::Mat segmented_image_matrix(image.rows, image.cols, CV_8UC1);
 
     for(int i=0;i<segmentedImage.size()-2;++i) {
         int u = floor(i/image.cols);
         int v = i%image.cols;
         if(segmentedImage[i]==true)
         {
-            mask.at<uint8_t>(u,v) = 255;
+            segmented_image_matrix.at<uint8_t>(u,v) = 255;
         }
         else if(segmentedImage[i]==false)
         {
-            mask.at<uint8_t>(u,v) = 0;
+            segmented_image_matrix.at<uint8_t>(u,v) = 0;
         }
         
     }
     std::cout<<"Saving Image..\n";
-    cv::imwrite("output_ek.png",mask);   
+    cv::imwrite("segmented_image.png",segmented_image_matrix);   
 }

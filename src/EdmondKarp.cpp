@@ -3,9 +3,9 @@
 EdmondKarp::EdmondKarp(vector<map<int, array<int,2>>> flow_graph) {
     image_flow_graph = flow_graph;
     segmentedImage.resize(flow_graph.size());
-    std::fill(segmentedImage.begin(), segmentedImage.end(), false);
     graph_source = flow_graph.size() - 2;
     graph_sink = flow_graph.size() - 1;
+    fill(segmentedImage.begin(), segmentedImage.end(), false);
 }
 
 void EdmondKarp::initiate_algorithm() {
@@ -25,7 +25,6 @@ void EdmondKarp::initiate_algorithm() {
             flow += flow_p;
         }
         iter ++;
-        //std::cout<<iter<<"\n";
     }
     std::cout<<flow<<"\n";
     std::cout << "Number of iterations :" << iter << std::endl;
@@ -50,7 +49,6 @@ void EdmondKarp::getAugmentingPaths(vector<int>& path, set<int>& accessibleNodes
 
         for(auto& next_node_values : image_flow_graph[current]) {
             if(visited.find(next_node_values.first) == visited.end()) {
-                //cout<<next_node_values.second[capacity]<<" "<<next_node_values.second[flow]<<"\n";
                 if((next_node_values.second[0]-next_node_values.second[1]) > 0) {
                     s.push(next_node_values.first);
                     visited.emplace(next_node_values.first, current);
@@ -98,5 +96,4 @@ void EdmondKarp::makeSegmentation(set<int> accessibleNodes) {
     for(auto node:accessibleNodes) {
         segmentedImage[node] = true;
     }
-
 }
