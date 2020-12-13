@@ -38,10 +38,7 @@ int edmondk(char *file, char out_file[256], char time[128], char iter[128])
     string algorithmChoice = "edmond-karp";
     
     ImageData img(imageName);
-    // src_x = 33;
-    // src_y = 33;
-    // sink_x = 2;
-    // sink_y = 2;
+
     if (img.image.rows<src_x || img.image.rows<sink_x){
         cout << "ERROR: Coordinates exceed image dimentions"<<endl;
         return 1;
@@ -51,14 +48,11 @@ int edmondk(char *file, char out_file[256], char time[128], char iter[128])
         return 1;
     }
 
-
     cout << "CORDINATES"<<endl;
     cout << src_x << " "<< src_x <<endl;
     cout << sink_x << " "<< sink_x <<endl;
     img.Image_To_Flow_Graph(src_x, src_y, sink_x, sink_y);
 
-    //cv::namedWindow("Display window", 1);
-    //cv::imshow("Display window", img.image);
     char* path = realpath(image_name, NULL);
     string abspath(path);
 
@@ -84,7 +78,7 @@ int edmondk(char *file, char out_file[256], char time[128], char iter[128])
         printf("FINISHED --- TOTAL CPU TIME %f SECS \n",(float)TT2);
         img.saveImage(ek.segmentedImage, out_file_str);
     }
-    //char buffer[128];
+
     snprintf(time, 128, "%f", (float)TT2);
     snprintf(iter, 128, "%d", iterl);
 

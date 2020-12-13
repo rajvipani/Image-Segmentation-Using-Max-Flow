@@ -36,10 +36,7 @@ int pushr(char *file, char out_file[256], char time[128], char iter[128])
     
     ImageData img(imageName);
     cv::Mat dest;
-    // if (img.image.rows > 50 || img.image.cols > 50){
-    // cv::resize(img.image,dest,cv::Size(50,50),0,0,cv::INTER_CUBIC);
-    // img.image = dest;      
-    // }
+
     cout << "CORDINATES"<<endl;
     cout << file << endl;
     cout << src_x << " "<< src_y <<endl;
@@ -55,9 +52,6 @@ int pushr(char *file, char out_file[256], char time[128], char iter[128])
     }
 
     img.Image_To_Flow_Graph(src_x, src_y, sink_x, sink_y);
-
-    //cv::namedWindow("Display window", 1);
-    //cv::imshow("Display window", img.image);
 
     char* path = realpath(image_name, NULL);
     string abspath(path);
@@ -94,8 +88,6 @@ int pushr(char *file, char out_file[256], char time[128], char iter[128])
 
     return 0;
 }
-
-
 
 extern "C" {
     int pushr_c(char *file, char outfile[256], char time[128], char iter[128]){

@@ -8,97 +8,6 @@
 using namespace cv;
 using namespace std;
 
-// int file_read(char *file, char out_file[256]);
-// int kmeans_clusering(char *file, char out_file[256]);
-
-
-// int main(int argc, char *argv[])
-// {
-//     Mat ocv = imread("rabbit.jpg",IMREAD_GRAYSCALE);
-//     Mat data;
-//     ocv.convertTo(data,CV_32F);
-//     data = data.reshape(1,data.total());
-//     Mat labels, centers;
-//     kmeans(data, 2, labels, TermCriteria(CV_TERMCRIT_ITER, 10, 1.0), 3, KMEANS_PP_CENTERS, centers);
-
-//     // reshape both to a single row of Vec3f pixels:
-//     centers = centers.reshape(1,centers.rows);
-//     data = data.reshape(1,data.rows);
-
-// // replace pixel values with their center value:
-// float *p = data.ptr<float>();
-// for (size_t i=0; i<data.rows; i++) {
-//    int center_id = labels.at<int>(i);
-//    p[i] = centers.at<float>(center_id);
-// }
-
-// // back to 2d, and uchar:
-// ocv = data.reshape(1, ocv.rows);
-// ocv.convertTo(ocv, CV_8U);
-// imshow("Display window", ocv);
-//     int k = waitKey(0); // Wait for a keystroke in the window
-//     if(k == 's')
-//     {
-//         imwrite("rabbittest.png", ocv);
-//     }
-//     // std::string image_path;
-//     // if (argc==2){
-//     //     image_path = samples::findFile(argv[1]);
-//     // }
-//     // else{
-//     //     image_path = samples::findFile("rabbit.jpg");       
-//     // }
-
-//     // Mat img = imread(image_path, IMREAD_GRAYSCALE);
-//     // if(img.empty())
-//     // {
-//     //     std::cout << "Could not read the image: " << image_path << std::endl;
-//     //     return 1;
-//     // }
-//     // //imshow("Display window", img);
-
-//     // Mat ocv = img;
-
-//     // Mat data;
-//     // img.convertTo(data,CV_32F);
-//     // Mat labels, centers;
-
-//     // kmeans(data, 2, labels, TermCriteria(1, 10, 1.0), 3, KMEANS_PP_CENTERS, centers);
-
-//     // centers = centers.reshape(1,centers.rows);
-//     // data = data.reshape(1,data.rows);
-//     char file[128] = "image_data.txt";
-//     char outfile[256];
-//     //file = ;
-//     //file_read(file,outfile);
-//     kmeans_clusering(file,outfile);
-// /*
-//     // replace pixel values with their center value:
-//     Vec1f *p = data.ptr<Vec1f>();
-//     for (size_t i=0; i<data.rows; i++) {
-//        int center_id = labels.at<int>(i);
-//        p[i] = centers.at<Vec1f>(center_id);
-//     }
-// */
-// /*
-//     ocv = data.reshape(1, ocv.rows);
-
-//     ocv.convertTo(ocv, CV_8U);
-
-//     int k = waitKey(0); // Wait for a keystroke in the window
-//     if(k == 's')
-//     {
-//         imwrite("rabbit.png", img);
-//     }
-// */
-//     return 0;
-// }
-
-
-
-
-
-
 int kmeans_clusering(char *file, char out_file[256], char time[128], char iter[128]){
 
     FILE *fp1;
@@ -121,9 +30,6 @@ int kmeans_clusering(char *file, char out_file[256], char time[128], char iter[1
         std::cout << "Could not read the image: " << image_name << std::endl;
         return 1;
     }
-// src - foreground
-//    sink - background
-
 
     Mat data;
     ocv.convertTo(data,CV_32F);

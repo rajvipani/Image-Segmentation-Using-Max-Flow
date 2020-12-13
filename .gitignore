@@ -1,3 +1,10 @@
 .DS_Store
 src/.vscode
 src/.DS_Store
+src/main.so
+src/main
+src/pushr.so
+src/edk.so
+gui/main.so
+gui/main
+gui/image_data.txt

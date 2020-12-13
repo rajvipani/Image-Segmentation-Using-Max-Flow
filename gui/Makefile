@@ -1,6 +1,6 @@
-CXX      := g++ -std=c++11
-CXXFLAGS := -g `pkg-config --cflags opencv4` #-fsanitize=address 
-LDFLAGS  := `pkg-config --libs opencv4` #-fsanitize=address 
+CXX      ?= g++ -std=c++11
+CXXFLAGS ?= -g `pkg-config --cflags opencv4`
+LDFLAGS  ?= `pkg-config --libs opencv4` 
 
 build:
 	$(CXX) $(CXXFLAGS) main.cpp $(LDFLAGS) -o main 
