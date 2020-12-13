@@ -1,6 +1,6 @@
-CXX      ?= g++ -std=c++11
-CXXFLAGS ?= `pkg-config --cflags opencv4`
-LDFLAGS  ?= `pkg-config --libs opencv4`
+CXX      := g++ -std=c++11
+CXXFLAGS := `pkg-config --cflags opencv4`
+LDFLAGS  := `pkg-config --libs opencv4`
 
 build:
 	$(CXX) $(CXXFLAGS) main.cpp ImageData.cpp PushRelabel.cpp EdmondKarp.cpp $(LDFLAGS) -o main 
